@@ -5,7 +5,7 @@ CREATE TABLE employees (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
   email VARCHAR(100),
-  role ENUM('EMPLOYEE','HR','ADMIN'),
+  role ENUM('EMPLOYEE','ADMIN'),
   salary_per_day DECIMAL(10,2)
 );
 
@@ -40,6 +40,5 @@ CREATE TABLE profile_requests (
 
 INSERT INTO employees VALUES
 (1,'John Doe','john@test.com','EMPLOYEE',500),
-(2,'HR Manager','hr@test.com','HR',800),
 (3,'Admin','admin@test.com','ADMIN',1000);
 
