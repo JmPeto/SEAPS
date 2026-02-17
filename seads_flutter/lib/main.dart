@@ -131,9 +131,6 @@ Widget _contentArea() {
           onDelete: deleteEmployee,
         );
 
-      case "HR":
-        return const PlaceholderPage(title: "HR Management");
-
       case "Payroll":
   return const PayrollView();
 
@@ -1009,7 +1006,7 @@ class _AddEmployeeFormState extends State<AddEmployeeForm> {
 
   bool isLoading = false;
 
-  final List<String> roles = ["ADMIN", "EMPLOYEE", "HR"];
+  final List<String> roles = ["ADMIN", "EMPLOYEE",];
 
   void submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -1106,7 +1103,7 @@ class _EditEmployeeFormState extends State<EditEmployeeForm> {
   late String selectedRole;
   bool isLoading = false;
 
-  final List<String> roles = ["ADMIN", "EMPLOYEE", "HR"];
+  final List<String> roles = ["ADMIN", "EMPLOYEE",];
 
   @override
   void initState() {
