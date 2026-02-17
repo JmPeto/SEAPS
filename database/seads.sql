@@ -39,6 +39,6 @@ CREATE TABLE profile_requests (
 );
 
 INSERT INTO employees VALUES
-(1,'John Doe','john@test.com','EMPLOYEE',500),
+(1,'Xian','Xian@gmail.com','EMPLOYEE',500),
 (3,'Admin','admin@test.com','ADMIN',1000);
 
