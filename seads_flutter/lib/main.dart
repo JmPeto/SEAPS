@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'package:intl/intl.dart';
@@ -140,8 +141,8 @@ Widget _contentArea() {
       case "Request Support":
         return const PlaceholderPage(title: "Request Support");
 
-      case "Settings":
-        return const PlaceholderPage(title: "Settings");
+    case "Settings":
+  return const SettingsView();
         
 
       default:
@@ -1622,4 +1623,301 @@ class _PayrollViewState extends State<PayrollView> {
     );
   }
 }
+/* ================= SETTINGS VIEW ================= */
+class SettingsView extends StatefulWidget {
+  const SettingsView({super.key});
 
+  @override
+  State<SettingsView> createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
+  final TextEditingController lateController =
+      TextEditingController(text: "49");
+  final TextEditingController absenceController =
+      TextEditingController(text: "200");
+  final TextEditingController overtimeController =
+      TextEditingController(text: "25");
+
+  TimeOfDay workStart = const TimeOfDay(hour: 8, minute: 0);
+  TimeOfDay workEnd = const TimeOfDay(hour: 17, minute: 0);
+
+  @override
+  void dispose() {
+    lateController.dispose();
+    absenceController.dispose();
+    overtimeController.dispose();
+    super.dispose();
+  }
+
+  String formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(
+        now.year, now.month, now.day, time.hour, time.minute);
+    return TimeOfDay.fromDateTime(dt).format(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFFF4F6FA),
+      padding: const EdgeInsets.fromLTRB(35, 20, 32, 20),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            const Text(
+              "Welcome, Admin!",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            /// ================= DEDUCTION CONFIGURATION =================
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  const Text(
+                    "Deduction Configuration",
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+
+                      /// Late Deduction
+                      Expanded(
+                        child: _settingsField(
+                          label: "Late Deduction (per hour)",
+                          controller: lateController,
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      /// Absence Deduction
+                      Expanded(
+                        child: _settingsField(
+                          label: "Absence Deduction (per day)",
+                          controller: absenceController,
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      /// Overtime Rate
+                      Expanded(
+                        child: _settingsField(
+                          label: "Overtime Rate (per hour)",
+                          controller: overtimeController,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Configuration Saved")),
+                      );
+                    },
+                    icon: const Icon(Icons.save),
+                    label: const Text("Save Configuration"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            /// ================= WORK SCHEDULE =================
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  const Text(
+                    "Work Schedule Settings",
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+
+                      /// Start Time
+                      Expanded(
+                        child: _timePickerField(
+                          label: "Work Start Time",
+                          time: workStart,
+                          onTap: () async {
+                            final picked = await showTimePicker(
+                              context: context,
+                              initialTime: workStart,
+                            );
+                            if (picked != null) {
+                              setState(() => workStart = picked);
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      /// End Time
+                      Expanded(
+                        child: _timePickerField(
+                          label: "Work End Time",
+                          time: workEnd,
+                          onTap: () async {
+                            final picked = await showTimePicker(
+                              context: context,
+                              initialTime: workEnd,
+                            );
+                            if (picked != null) {
+                              setState(() => workEnd = picked);
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F0FE),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "Current Schedule: ${formatTime(workStart)} - ${formatTime(workEnd)}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Schedule Saved")),
+                      );
+                    },
+                    icon: const Icon(Icons.save),
+                    label: const Text("Save Schedule"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _settingsField({
+    required String label,
+    required TextEditingController controller,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            prefixText: "₱ ",
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _timePickerField({
+    required String label,
+    required TimeOfDay time,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.access_time),
+                const SizedBox(width: 8),
+                Text(formatTime(time)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
