@@ -1,44 +1,48 @@
+DROP DATABASE IF EXISTS seads;
 CREATE DATABASE seads;
 USE seads;
 
+-- ================= EMPLOYEES =================
 CREATE TABLE employees (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
-  email VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255),
   role ENUM('EMPLOYEE','ADMIN'),
-  salary_per_day DECIMAL(10,2)
+  salary_per_day DECIMAL(10,2) DEFAULT 0
 );
 
+-- ================= ATTENDANCE =================
 CREATE TABLE attendance (
   id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT,
   date DATE,
-  status ENUM('PRESENT','ABSENT','LEAVE')
+  status ENUM('PRESENT','ABSENT','LEAVE'),
+  FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
 );
 
-CREATE TABLE leave_requests (
+-- ================= PAYROLL =================
+CREATE TABLE payroll (
   id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT,
-  date DATE,
-  reason TEXT,
-  status ENUM('PENDING','APPROVED','REJECTED')
+  month VARCHAR(20),
+  basic_salary DECIMAL(10,2) DEFAULT 0,
+  tax_withheld DECIMAL(10,2) DEFAULT 0,
+  net_pay DECIMAL(10,2) DEFAULT 0,
+  status ENUM('Pending','Completed') DEFAULT 'Pending',
+  FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
 );
 
-CREATE TABLE correction_requests (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  attendance_id INT,
-  reason TEXT,
-  status ENUM('PENDING','APPROVED','REJECTED')
-);
-
-CREATE TABLE profile_requests (
+-- ================= SUPPORT REQUESTS =================
+CREATE TABLE support_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT,
-  new_email VARCHAR(100),
-  status ENUM('PENDING','APPROVED','REJECTED')
+  request_type VARCHAR(50),
+  message TEXT,
+  status ENUM('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING'
 );
 
-INSERT INTO employees VALUES
-(1,'Xian','Xian@gmail.com','EMPLOYEE',500),
-(3,'Admin','admin@test.com','ADMIN',1000);
-
+-- ================= SAMPLE DATA =================
+INSERT INTO employees (name,email,password,role,salary_per_day) VALUES
+('John Doe','john@test.com','1234','EMPLOYEE',500),
+('Admin','admin@test.com','1234','ADMIN',1000);
