@@ -193,4 +193,42 @@
 
       return null;
     }
+
+    /* ===== SUPPORT REQUESTS ===== */
+    static Future<List<Map<String, dynamic>>> fetchAllSupportRequests() async {
+      final res = await http.get(Uri.parse("$baseUrl/support-requests/all"));
+
+      if (res.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(jsonDecode(res.body));
+      }
+      return [];
+    }
+
+    static Future<bool> createSupportRequest(
+        int employeeId, String requestType, String message) async {
+      final res = await http.post(
+        Uri.parse("$baseUrl/support-requests/create"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "employee_id": employeeId,
+          "request_type": requestType,
+          "message": message,
+        }),
+      );
+      return res.statusCode == 200;
+    }
+
+    static Future<bool> updateSupportRequestStatus(
+        int id, String status) async {
+      final res = await http.post(
+        Uri.parse("$baseUrl/support-requests/update-status"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "id": id,
+          "status": status,
+        }),
+      );
+      return res.statusCode == 200;
+    }
   }
+
