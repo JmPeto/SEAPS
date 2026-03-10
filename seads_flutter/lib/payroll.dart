@@ -348,3 +348,104 @@ class _PayrollViewState extends State<PayrollView> {
     );
   }
 }
+
+class PayrollModule {
+  // Currency formatter for Philippine Peso
+  static final NumberFormat phpFormatter = NumberFormat.currency(locale: 'en_PH', symbol: '₱');
+
+  // Compute work hours from attendance data
+  // attendanceData: List of maps from attendance.dart
+  static Map<String, double> computeWorkHours(List<Map<String, dynamic>> attendanceData) {
+    Map<String, double> employeeHours = {};
+
+    for (var record in attendanceData) {
+      String employeeId = record['employee_id'] ?? '';
+      double hours = double.tryParse(record['total_hours']?.toString() ?? '0') ?? 0.0;
+
+      if (employeeId.isNotEmpty) {
+        employeeHours[employeeId] = (employeeHours[employeeId] ?? 0) + hours;
+      }
+    }
+
+    return employeeHours;
+  }
+
+  // Compute work days (assuming 8 hours per day)
+  static Map<String, double> computeWorkDays(List<Map<String, dynamic>> attendanceData) {
+    Map<String, double> employeeDays = {};
+
+    for (var record in attendanceData) {
+      String employeeId = record['employee_id'] ?? '';
+      double hours = double.tryParse(record['total_hours']?.toString() ?? '0') ?? 0.0;
+      double days = hours / 8.0; // Assuming 8 hours per day
+
+      if (employeeId.isNotEmpty) {
+        employeeDays[employeeId] = (employeeDays[employeeId] ?? 0) + days;
+      }
+    }
+
+    return employeeDays;
+  }
+
+  // Placeholder for SSS deduction
+  static double computeSSSDeduction(double monthlySalary) {
+    // Placeholder formula: 8% of salary
+    return monthlySalary * 0.08;
+  }
+
+  // Placeholder for Philhealth deduction
+  
+  static double computePhilhealthDeduction(double monthlySalary) {
+    // Placeholder of salary
+    
+    return monthlySalary * 0.02;
+  }
+
+  // Total deductions placeholder
+  static double computeTotalDeductions(double monthlySalary) {
+    double sss = computeSSSDeduction(monthlySalary);
+    double philhealth = computePhilhealthDeduction(monthlySalary);
+    // Add other deductions here, like Pag-IBIG, tax, etc.
+    return sss + philhealth;
+  }
+
+  // Net salary computation
+  static double computeNetSalary(double grossSalary) {
+    double deductions = computeTotalDeductions(grossSalary);
+    return grossSalary - deductions;
+  }
+
+  // Format amount in PHP
+  static String formatPHP(double amount) {
+    return phpFormatter.format(amount);
+  }
+
+  // Example integration function
+  // This can be called from attendance or dashboard
+  // salaries: Map of employee_id to monthly salary
+  static Map<String, dynamic> generatePayrollReport(
+      List<Map<String, dynamic>> attendanceData, Map<String, double> salaries) {
+    Map<String, double> workHours = computeWorkHours(attendanceData);
+    Map<String, double> workDays = computeWorkDays(attendanceData);
+
+    Map<String, dynamic> report = {};
+
+    for (var employeeId in salaries.keys) {
+      double salary = salaries[employeeId] ?? 0.0;
+      double hours = workHours[employeeId] ?? 0.0;
+      double days = workDays[employeeId] ?? 0.0;
+      double netSalary = computeNetSalary(salary);
+
+      report[employeeId] = {
+        'workHours': hours,
+        'workDays': days,
+        'grossSalary': salary,
+        'netSalary': netSalary,
+        'deductions': computeTotalDeductions(salary),
+        'formattedNetSalary': formatPHP(netSalary),
+      };
+    }
+
+    return report;
+  }
+}
